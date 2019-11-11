@@ -1,0 +1,1 @@
+{"0": null, "1": "C:\\Users\\jdine\\Documents\\UVA_Fall2019\\Algorithms\\FinalProject\\Seam-Carving\\", "Browse": "", "2": "C:\\Users\\jdine\\Documents\\UVA_Fall2019\\Algorithms\\FinalProject\\Seam-Carving\\trial.png", "3": "Row", "4": "Sobel", "5": 50.0}
