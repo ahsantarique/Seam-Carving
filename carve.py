@@ -24,18 +24,18 @@ from os.path import splitext
 import warnings
 warnings.filterwarnings('ignore')
 import time
+
 import json
 
 
 #!pip install pysimplegui
-
 
 #Did not touch the below 3 methods
 #Dynamic Programming Stuff
 #--------------------------------------------------------#
 #--------------------------------------------------------#
 #--------------------------------------------------------#
-def calc_energy(img): 
+def calc_energy(img):
     #NEED: Param for filter type. Believe this is using Sobel.
     filter_du = np.array([
         [1.0, 2.0, 1.0],
@@ -147,10 +147,10 @@ def crop_c(img, scale_c, save_progress = 10, rotation=False):
     '''
     Backbone for main carve method.
     Parms:
-        img: arr (pass through), 
+        img: arr (pass through),
         scale_c: float, rescale proportion [0,100]
         rotation: bool, flag on if row-wise carving
-    
+
     '''
     r, c, _ = img.shape
     new_c = int(scale_c * c)
@@ -182,7 +182,7 @@ def crop_r(img, scale_r , save_progress = 10):
     '''
     Backbone for main carve method.
     Uses crop_c under the hood
-    
+
     '''
     img = np.rot90(img, 1, (0, 1)) #Rotate 90degrees
     img = crop_c(img, scale_r, save_progress = save_progress, rotation=True) #Carve
@@ -198,13 +198,13 @@ def carve(img, dim, output, scale=0.5 , save_progress = 10):
     Main Method for Seam Carving
     parms:
         img: str; image path. Passed through from GUI.
-        dim: str; 'Row' or 'Column'. Passed through from GUI dict. 
+        dim: str; 'Row' or 'Column'. Passed through from GUI dict.
         output: str; final resting place of carved image.
         scale: float; desired resize. Passed through from GUI.
     returns:
         saves carved image in desired new path.
-    
-    
+
+
     '''
     img = imageio.imread(img)
     if dim == 'Column':
@@ -216,13 +216,13 @@ def carve(img, dim, output, scale=0.5 , save_progress = 10):
         imageio.imsave(output, new)
 
 
-        
-#Helpers        
+
+#Helpers
 #--------------------------------------------------------#
 def transform_images():
     '''
     returns: None
-    Runs prior to GUI launch. 
+    Runs prior to GUI launch.
     PySimpleGUI only takes pngs as input. Need to transform all jpgs apriori
     '''
     for infile in glob.glob("*.jpg"):
@@ -238,7 +238,7 @@ def create_new_path(path):
     '''
     path: str; will be passed image path from dictionary returned by GUI form fill
     returns: Temp path to store final resized image
-    
+
     '''
     path = os.path.basename(path)
     file_name, extension = splitext(path)
@@ -277,8 +277,8 @@ try:
         shutil.rmtree('temp/')
         shutil.rmtree('gif/')
         shutil.rmtree('carved/')
-        os.makedirs('temp')  
-        os.makedirs('gif')  
+        os.makedirs('temp')
+        os.makedirs('gif')
         os.makedirs('carved')
 #--------------------------------------------------------#
 
@@ -311,18 +311,7 @@ try:
                     font=("Helvetica", 24),
                     relief=sg.RELIEF_RIDGE)
         ],
-         # ------ Folder Selector ------ #
-        [
-            sg.Text(
-                'Choose A Folder',
-                size=(20, 1),
-                auto_size_text=True,
-                justification='center',
-                tooltip=
-                'Directory Selection. Defaults to current Working Directory.'),
-            sg.InputText(directory, size=(80, 1)),
-            sg.FolderBrowse()
-        ],
+
          # ------ Image Selector ------ #
         [
             sg.Text(
@@ -426,14 +415,14 @@ try:
         [4]: Filter Type. To do. Defaults to Sobel?
         [5]: Rescale Size. Resize to [0,1] range.
         [6]: How often to checkpoint an image during carving. Defaults to 10. >10 is slow on gif creation
-        
+
         '''
         #Run Main Carving Method
         #--------------------------------------------------------#
 
         output = 'carved/' + create_new_path(
             vals['2'])  #specify carved output location
-        
+
         carve(vals['2'], dim=vals['3'], output=output,
               scale=vals['5'] / 100, save_progress= vals['6']) #run seam carving
 
@@ -463,7 +452,7 @@ try:
                                  message="Showing Carve Progression")
             else:
                 break
-                
+
         sg.PopupAnimated(None)
         #Launch Second Window
         #--------------------------------------------------------#
@@ -489,7 +478,3 @@ except:
 
 
 # In[ ]:
-
-
-
-

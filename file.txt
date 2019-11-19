@@ -1,1 +1,1 @@
-{"0": null, "1": "C:\\Users\\jdine\\Documents\\test\\Seam-Carving\\images", "Browse": "", "2": "C:\\Users\\jdine\\Documents\\test\\Seam-Carving\\images\\trial.png", "3": "Column", "4": "Sobel", "5": 50.0, "6": 10.0}
+{"0": null, "1": "C:\\Users\\jdine\\Documents\\test\\Seam-Carving\\images", "Browse": "", "2": "C:\\Users\\jdine\\Documents\\test\\Seam-Carving\\images\\trial.png", "3": "Column", "4": "Sobel", "5": 81.0, "6": 10.0}
