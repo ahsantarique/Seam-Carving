@@ -311,7 +311,18 @@ try:
                     font=("Helvetica", 24),
                     relief=sg.RELIEF_RIDGE)
         ],
-
+         # ------ Folder Selector ------ #
+        [
+            sg.Text(
+                'Choose A Folder',
+                size=(20, 1),
+                auto_size_text=True,
+                justification='center',
+                tooltip=
+                'Directory Selection. Defaults to current Working Directory.'),
+            sg.InputText(directory, size=(80, 1)),
+            #sg.FolderBrowse()
+        ],
          # ------ Image Selector ------ #
         [
             sg.Text(
@@ -443,12 +454,12 @@ try:
 
         #Popup Window Showing Carve Progression. Max Time on screen is fixed to 30 seconds before disappearing
         #--------------------------------------------------------#
-        timeout = time.time() + 30  #30 second popup limit
+        timeout = time.time() + 20  #30 second popup limit
         frames = len(os.listdir("temp/"))  #Count of frames in Gif
         while True:
             if time.time() < timeout:
                 sg.PopupAnimated(image_source=r"gif\movie.gif",
-                                 time_between_frames=(30 / frames * 1000) / 2,
+                                 time_between_frames=(30 / frames * 1000) / 6,
                                  message="Showing Carve Progression")
             else:
                 break
