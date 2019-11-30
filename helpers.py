@@ -4,6 +4,12 @@ import os
 from os.path import splitext
 import shutil
 import imageio
+import matplotlib.pylab as plt
+from skimage.io import imread
+from skimage.color import rgb2gray
+from skimage import filters
+
+
 #Helpers
 #--------------------------------------------------------#
 def transform_images():
@@ -47,11 +53,28 @@ def create_dirs():
         os.makedirs('temp')  #This is where progress images are stored
         os.makedirs('gif')  #This is where Gif will be stored
         os.makedirs('carved')
+        os.makedirs('energy')
     except:
         #Delete Folders if already in DIR
         shutil.rmtree('temp/')
         shutil.rmtree('gif/')
         shutil.rmtree('carved/')
+        shutil.rmtree('energy/')
         os.makedirs('temp')
         os.makedirs('gif')
         os.makedirs('carved')
+        os.makedirs('energy')
+
+
+def save_energy_map(img):
+    im = rgb2gray(imageio.imread(img)) # RGB image to gray scale
+    plt.gray()
+    plt.figure(figsize=(20,10))
+    plt.subplot(221)
+    plt.imshow(im)
+    plt.title('original', size=10)
+    plt.subplot(222)
+    edges = filters.sobel(im)
+    plt.imshow(edges)
+    plt.title('sobel', size=10)
+    plt.savefig('energy/energymap.png', dpi = 100, bbox_inches='tight')

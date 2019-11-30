@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[19]:
 
 
 import sys
@@ -22,8 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 import time
 import json
-from helpers import transform_images, create_new_path, create_gif, create_dirs
-
+from helpers import transform_images, create_new_path, create_gif, create_dirs, save_energy_map
 
 #!pip install pysimplegui
 
@@ -368,6 +363,8 @@ if __name__ == '__main__':
             carve(vals['2'], dim=vals['3'], output=output,
                   scale=vals['5'] / 100, save_progress= vals['6']) #run seam carving
 
+            save_energy_map(vals['2'])
+
             window2_active = True
 
             #Layout for window 2 specified. Show Original and Carved image side by side.
@@ -378,20 +375,22 @@ if __name__ == '__main__':
                     sg.Text('Original Image'),
                     sg.Image(r"{}".format(vals['2'])),
                     sg.Image(r"{}".format(output)),
-                    sg.Text('Carved Image')
+                    sg.Text('Carved Image'),
+
                 ],
+                [sg.Image(r"{}".format('energy/energymap.png'))],
                 [sg.Button('Exit')],
             ]
 
             #Popup Window Showing Carve Progression. Max Time on screen is fixed to 30 seconds before disappearing
             #--------------------------------------------------------#
-            timeout = time.time() + 20  #30 second popup limit
+            timeout = time.time() + 10  #30 second popup limit
             frames = len(os.listdir("temp/"))  #Count of frames in Gif
             while True:
                 if time.time() < timeout:
                     sg.PopupAnimated(image_source=r"gif\movie.gif",
                                      time_between_frames=(30 / frames * 1000) / 6,
-                                     message="Showing Carve Progression")
+                                     message="Showing Carve Progression. 10 Second Loop")
                 else:
                     break
 
