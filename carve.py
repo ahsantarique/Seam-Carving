@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[19]:
 
 
 import sys
@@ -28,48 +32,79 @@ from helpers import transform_images, create_new_path, create_gif, create_dirs, 
 #--------------------------------------------------------#
 #--------------------------------------------------------#
 #--------------------------------------------------------#
-def calc_energy(img):
-    #NEED: Param for filter type. Believe this is using Sobel.
-    filter_du = np.array([
-        [1.0, 2.0, 1.0],
-        [0.0, 0.0, 0.0],
-        [-1.0, -2.0, -1.0],
-    ])
-    # This converts it from a 2D filter to a 3D filter, replicating the same
-    # filter for each channel: R, G, B
-    filter_du = np.stack([filter_du] * 3, axis=2)
+def calc_energy(img, operator):
+    #https://en.wikipedia.org/wiki/Sobel_operator
+    #
+    if operator == 'Sobel':
+        dx = np.array([
+            [1.0, 2.0, 1.0],
+            [0.0, 0.0, 0.0],
+            [-1.0, -2.0, -1.0],
+        ])
+        dy = np.array([
+            [1.0, 0.0, -1.0],
+            [2.0, 0.0, -2.0],
+            [1.0, 0.0, -1.0],
+        ])
+    if operator == 'Sobel_Feldman':
+        dx = np.array([
+            [3.0, 0.0, -3.0],
+            [10.0, 0.0, -10.0],
+            [3.0, 0.0, -3.0],
+        ])
 
-    filter_dv = np.array([
-        [1.0, 0.0, -1.0],
-        [2.0, 0.0, -2.0],
-        [1.0, 0.0, -1.0],
-    ])
-    # This converts it from a 2D filter to a 3D filter, replicating the same
-    # filter for each channel: R, G, B
-    filter_dv = np.stack([filter_dv] * 3, axis=2)
+        dy = np.array([
+            [3.0, 10.0, 3.0],
+            [0.0, 0.0, 0.0],
+            [-3.0, -10.0, -3.0],
+        ])
+    if operator == 'Scharr':
+        dx = np.array([
+            [47.0, 0.0, -47.0],
+            [162.0, 0.0, -162.0],
+            [47.0, 0.0, -47.0],
+        ])
 
+        dy = np.array([
+            [47.0, 162.0, 47.0],
+            [0.0, 0.0, 0.0],
+            [-47.0, -162.0, -47.0],
+        ])
+    # Stack Filter for all dims
+
+    filter_dx = np.stack([dx] * 3, axis=2)
+    filter_dy = np.stack([dy] * 3, axis=2)
+
+    #img to array
     img = img.astype('float32')
-    convolved = np.absolute(convolve(img, filter_du)) + np.absolute(
-        convolve(img, filter_dv))
 
-    # We sum the energies in the red, green, and blue channels
-    energy_map = convolved.sum(axis=2)
+    #Convolve filter over image channels
+    #http://cs.brown.edu/courses/cs129/results/proj3/taox/
+    #For each color channel, the energy is calculated by adding the
+    #absolute value of the gradient in the x direction to the absolute value of the gradient in the y direction.
+    convolved = np.absolute(convolve(img, filter_dx)) + np.absolute(
+        convolve(img, filter_dy))
 
-    return energy_map
+    energy = convolved.sum(axis=2)
+    #Energy returns image gradient with filter convolved over each dim
+    return energy
 
 
 #--------------------------------------------------------#
 @jit
-def minimum_seam(img):
+def minimum_seam(img, operator = 'Sobel'):
     r, c, _ = img.shape
-    energy_map = calc_energy(img)
+    energy_map = calc_energy(img, operator)
 
-    M = energy_map.copy()
+    M = energy_map.copy() #Deep copy so we don't have ties between arrays
+    #instantiate cost matrix. This is the same shape as the images energy map
     backtrack = np.zeros_like(M, dtype=np.int)
 
-    for i in range(1, r):
+    for i in range(1, r): #ignore top row. Cost matrix values for top row are = to energy map
         for j in range(0, c):
-            # Handle the left edge of the image, to ensure we don't index -1
+            # http://cs.brown.edu/courses/cs129/results/proj3/taox/
+            #If a neighboring pixel is not available due to the left or right edge,
+            #it is simply not used in the minimum of top neighbors calculation.
             if j == 0:
                 idx = np.argmin(M[i - 1, j:j + 2])
                 backtrack[i, j] = idx + j
@@ -86,10 +121,10 @@ def minimum_seam(img):
 
 #--------------------------------------------------------#
 @jit
-def carve_column(img):
+def carve_column(img, operator = 'Sobel'):
     r, c, _ = img.shape
 
-    M, backtrack = minimum_seam(img)
+    M, backtrack = minimum_seam(img, operator)
 
     # Create a (r, c) matrix filled with the value True
     # We'll be removing all pixels from the image which
@@ -118,7 +153,7 @@ def carve_column(img):
 #--------------------------------------------------------#
 #Progressively Carve and Store Images at checkpoints
 #--------------------------------------------------------#
-def crop_c(img, scale_c, save_progress = 10, rotation=False):
+def crop_c(img, scale_c, save_progress = 10, rotation=False, operator = 'Sobel'):
     '''
     Backbone for main carve method.
     Parms:
@@ -134,7 +169,7 @@ def crop_c(img, scale_c, save_progress = 10, rotation=False):
         sg.OneLineProgressMeter('Stay Tuned.. Carving Image', i + 1, c - new_c,
                                 'key')
 
-        img = carve_column(img)
+        img = carve_column(img, operator = operator)
                                 #Store image after every k cols/rows carved for gif generation
         if i % save_progress == 0:
                                 #Handle Rotation Partitions for Row-wise Carving
@@ -152,13 +187,14 @@ def crop_c(img, scale_c, save_progress = 10, rotation=False):
 #--------------------------------------------------------#
 #Handle Row-Wise Carving
 #--------------------------------------------------------#
-def crop_r(img, scale_r , save_progress = 10):
+def crop_r(img, scale_r , save_progress = 10, operator = 'Sobel'):
     '''
     Backbone for main carve method.
     Uses crop_c under the hood
     '''
+    #Meta Heuristic
     img = np.rot90(img, 1, (0, 1)) #Rotate 90degrees
-    img = crop_c(img, scale_r, save_progress = save_progress, rotation=True) #Carve
+    img = crop_c(img, scale_r, save_progress = save_progress, rotation=True, operator= operator) #Carve
     img = np.rot90(img, 3, (0, 1)) #Rotate Back
     return img
 
@@ -166,7 +202,7 @@ def crop_r(img, scale_r , save_progress = 10):
 #--------------------------------------------------------#
 #Main Carving Method
 #--------------------------------------------------------#
-def carve(img, dim, output, scale=0.5 , save_progress = 10):
+def carve(img, dim, output, scale=0.5 , save_progress = 10, operator = 'Sobel'):
     '''
     Main Method for Seam Carving
     parms:
@@ -179,11 +215,11 @@ def carve(img, dim, output, scale=0.5 , save_progress = 10):
     '''
     img = imageio.imread(img)
     if dim == 'Column':
-        new = crop_c(img, scale_c=scale, save_progress = save_progress)
+        new = crop_c(img, scale_c=scale, save_progress = save_progress, operator = operator)
         imageio.imsave(output, new)
 
     if dim == 'Row':
-        new = crop_r(img, scale_r=scale, save_progress = save_progress)
+        new = crop_r(img, scale_r=scale, save_progress = save_progress, operator = operator)
         imageio.imsave(output, new)
 
 
@@ -285,7 +321,7 @@ if __name__ == '__main__':
                                 auto_size_text=True,
                                 justification='center',
                                 tooltip='Filter Selection'),
-                        sg.InputCombo(('Sobel', 'Kalman'),
+                        sg.InputCombo(('Sobel', 'Sobel_Feldman', 'Scharr'),
                                       default_value='Sobel',
                                       size=(20, 1))
                     ],
@@ -361,7 +397,7 @@ if __name__ == '__main__':
                 vals['2'])  #specify carved output location
 
             carve(vals['2'], dim=vals['3'], output=output,
-                  scale=vals['5'] / 100, save_progress= vals['6']) #run seam carving
+                  scale=vals['5'] / 100, save_progress= vals['6'], operator= vals['4']) #run seam carving
 
             save_energy_map(vals['2'])
 
