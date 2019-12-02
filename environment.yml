@@ -8,5 +8,6 @@ dependencies:
 - imageio
 - scipy
 - numba
+- scikit-image
 - pip:
   - PySimpleGUI
