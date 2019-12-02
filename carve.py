@@ -106,6 +106,12 @@ def minimum_seam(img, operator = 'Sobel'):
             #If a neighboring pixel is not available due to the left or right edge,
             #it is simply not used in the minimum of top neighbors calculation.
             if j == 0:
+                '''
+                [5,5,9
+                 10,1,11,
+                 5,3,1]
+
+                '''
                 idx = np.argmin(M[i - 1, j:j + 2])
                 backtrack[i, j] = idx + j
                 min_energy = M[i - 1, idx + j]
@@ -199,6 +205,7 @@ def crop_r(img, scale_r , save_progress = 10, operator = 'Sobel'):
     return img
 
 
+
 #--------------------------------------------------------#
 #Main Carving Method
 #--------------------------------------------------------#
@@ -221,6 +228,11 @@ def carve(img, dim, output, scale=0.5 , save_progress = 10, operator = 'Sobel'):
     if dim == 'Row':
         new = crop_r(img, scale_r=scale, save_progress = save_progress, operator = operator)
         imageio.imsave(output, new)
+    if dim == 'Both':
+        new = crop_c(img, scale_c=scale, save_progress = save_progress, operator = operator)
+        new = crop_r(new, scale_r=scale, save_progress = save_progress, operator = operator)
+        imageio.imsave(output, new)
+
 
 
 
@@ -309,7 +321,7 @@ if __name__ == '__main__':
                                 auto_size_text=True,
                                 justification='center',
                                 tooltip='Row or Column Carving'),
-                        sg.InputCombo(('Column', 'Row'),
+                        sg.InputCombo(('Column', 'Row', 'Both'),
                                       default_value='Column',
                                       size=(20, 1))
                     ],
