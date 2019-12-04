@@ -1,1 +1,1 @@
-{"0": null, "1": "C:\\Users\\jdine\\Documents\\UVA_Fall2019\\Algorithms\\FinalProject\\Seam-Carving\\images", "2": "C:\\Users\\jdine\\Documents\\UVA_Fall2019\\Algorithms\\FinalProject\\Seam-Carving\\images\\Broadway_tower_edit.png", "3": "Column", "4": "Sobel", "5": 50.0, "6": 20.0}
+{"0": null, "Browse": "/Users/ahsantarique/Device/Seam-Carving/images/tree.png", "1": "Column", "2": "Sobel", "3": 98.0, "4": 20.0}

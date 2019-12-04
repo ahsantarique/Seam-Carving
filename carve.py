@@ -237,6 +237,143 @@ def carve(img, dim, output, scale=0.5 , save_progress = 10, operator = 'Sobel'):
 
 
 
+def get_browser_layout():
+    #Window One Design
+    #--------------------------------------------------------#
+    sg.ChangeLookAndFeel('Material1')
+
+    # ------ Menu Definition ------ #
+    menu_def = [['File', ['Exit']]]
+
+    # ------ Column Definition ------ #
+    column1 = [
+        [
+            sg.Text('Column 1',
+                    background_color='#F7F3EC',
+                    justification='center',
+                    size=(10, 1))
+        ],
+        [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 1')],
+        [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 2')],
+        [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]
+    ]
+
+    layout = [
+        [sg.Menu(menu_def, tearoff=True)],
+        [
+            sg.Text('Seam Carving - content-aware image resizing',
+                    size=(40, 1),
+                    justification='center',
+                    font=("Helvetica", 24),
+                    relief=sg.RELIEF_RIDGE)
+        ],
+            # ------ Folder Selector ------ #
+        [
+            sg.Text(
+                'Choose A File',
+                size=(100, 1),
+                auto_size_text=True,
+                justification='left')
+        #         tooltip=
+        #         'Directory Selection. Defaults to current Working Directory.'),
+        #     sg.InputText(directory, size=(80, 1)),
+            #sg.FolderBrowse()
+        ],
+        
+        [sg.FileBrowse(target=(-1, 0))],
+
+        #  # ------ Image Selector ------ #
+        # [
+        #     sg.Text(
+        #         'Choose An Image',
+        #         size=(20, 1),
+        #         auto_size_text=True,
+        #         justification='center',
+        #         tooltip=
+        #         'Image Selection. Gui can only display .png files. jpgs run through conversion apriori.'
+        #     ),
+        #     sg.InputCombo(([i for i in files]),
+        #                   default_value=files[0],
+        #                   size=(80, 1))
+        # ],
+        [
+            sg.Frame(layout=[
+                # ------ Dimension Selector ------ #
+                [
+                    sg.Text('Choose A Dim To Carve Along',
+                            size=(25, 1),
+                            auto_size_text=True,
+                            justification='center',
+                            tooltip='Row or Column Carving'),
+                    sg.InputCombo(('Column', 'Row', 'Both'),
+                                    default_value='Column',
+                                    size=(20, 1))
+                ],
+                # ------ Filter Selector ------ #
+
+                [
+                    sg.Text('Choose A Filter To Use',
+                            size=(25, 1),
+                            auto_size_text=True,
+                            justification='center',
+                            tooltip='Filter Selection'),
+                    sg.InputCombo(('Sobel', 'Sobel_Feldman', 'Scharr'),
+                                    default_value='Sobel',
+                                    size=(20, 1))
+                ],
+                # ------ Rescale Size Selector ------ #
+                [
+                    sg.Text('Rescaling Factor',
+                            size=(25, 1),
+                            auto_size_text=True,
+                            justification='center',
+                            tooltip='Filter Selection'),
+                    sg.Slider(range=(1, 100),
+                                orientation='h',
+                                size=(34, 20),
+                                default_value=98)
+                ],
+                # ------ Save Progress Slider ------ #
+                [
+                    sg.Text('Save Every K Seams',
+                            size=(25, 1),
+                            auto_size_text=True,
+                            justification='center',
+                            tooltip='Filter Selection'),
+                    sg.Slider(range=(1, 20),
+                                orientation='h',
+                                size=(34, 20),
+                                default_value=20)
+                ],
+            ],
+                        title='Options',
+                        title_color='red',
+                        relief=sg.RELIEF_SUNKEN,
+                        tooltip='Set Parameters to Feed into SC algo')
+        ],
+        [sg.Text('_' * 80)],
+        [sg.Button('Launch'),
+            sg.Cancel()],
+    ]
+
+    return layout
+
+
+def get_carved_image_layout(image_path, output):
+    layout = [
+                #[sg.PopupAnimated('gif\movie.gif')],
+                [
+                    sg.Text('Original Image'),
+                    sg.Image(r"{}".format(image_path)),
+                    sg.Image(r"{}".format(output)),
+                    sg.Text('Carved Image'),
+
+                ],
+                [sg.Image(r"{}".format('energy/energymap.png'))],
+                [sg.Button('Exit')],
+            ]
+
+    return layout
 
 
 if __name__ == '__main__':
@@ -246,132 +383,19 @@ if __name__ == '__main__':
         directory = os.getcwd() + '\\' +'images' #Get CWD
         transform_images()  #Transform images
         #Get list of images in CWD
-        files = [
-            item for sublist in
-            [glob.glob(directory + ext) for ext in ["/*.png", "/*.jpg", "/*.gif"]]
-            for item in sublist
-        ]
+        # files = [
+        #     item for sublist in
+        #     [glob.glob(directory + ext) for ext in ["/*.png", "/*.jpg", "/*.gif"]]
+        #     for item in sublist
+        # ]
         #--------------------------------------------------------#
         #Create Temp Storage
         #--------------------------------------------------------#
         create_dirs()
         #--------------------------------------------------------#
 
-        #Window One Design
-        #--------------------------------------------------------#
-        sg.ChangeLookAndFeel('Material1')
-
-        # ------ Menu Definition ------ #
-        menu_def = [['File', ['Exit']]]
-
-        # ------ Column Definition ------ #
-        column1 = [
-            [
-                sg.Text('Column 1',
-                        background_color='#F7F3EC',
-                        justification='center',
-                        size=(10, 1))
-            ],
-            [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 1')],
-            [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 2')],
-            [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]
-        ]
-
-        layout = [
-            [sg.Menu(menu_def, tearoff=True)],
-            [
-                sg.Text('Seam Carving - content-aware image resizing',
-                        size=(40, 1),
-                        justification='center',
-                        font=("Helvetica", 24),
-                        relief=sg.RELIEF_RIDGE)
-            ],
-             # ------ Folder Selector ------ #
-            [
-                sg.Text(
-                    'Choose A Folder',
-                    size=(20, 1),
-                    auto_size_text=True,
-                    justification='center',
-                    tooltip=
-                    'Directory Selection. Defaults to current Working Directory.'),
-                sg.InputText(directory, size=(80, 1)),
-                #sg.FolderBrowse()
-            ],
-             # ------ Image Selector ------ #
-            [
-                sg.Text(
-                    'Choose An Image',
-                    size=(20, 1),
-                    auto_size_text=True,
-                    justification='center',
-                    tooltip=
-                    'Image Selection. Gui can only display .png files. jpgs run through conversion apriori.'
-                ),
-                sg.InputCombo(([i for i in files]),
-                              default_value=files[0],
-                              size=(80, 1))
-            ],
-            [
-                sg.Frame(layout=[
-                    # ------ Dimension Selector ------ #
-                    [
-                        sg.Text('Choose A Dim To Carve Along',
-                                size=(25, 1),
-                                auto_size_text=True,
-                                justification='center',
-                                tooltip='Row or Column Carving'),
-                        sg.InputCombo(('Column', 'Row', 'Both'),
-                                      default_value='Column',
-                                      size=(20, 1))
-                    ],
-                    # ------ Filter Selector ------ #
-
-                    [
-                        sg.Text('Choose A Filter To Use',
-                                size=(25, 1),
-                                auto_size_text=True,
-                                justification='center',
-                                tooltip='Filter Selection'),
-                        sg.InputCombo(('Sobel', 'Sobel_Feldman', 'Scharr'),
-                                      default_value='Sobel',
-                                      size=(20, 1))
-                    ],
-                    # ------ Rescale Size Selector ------ #
-                    [
-                        sg.Text('Rescaling Factor',
-                                size=(25, 1),
-                                auto_size_text=True,
-                                justification='center',
-                                tooltip='Filter Selection'),
-                        sg.Slider(range=(1, 100),
-                                  orientation='h',
-                                  size=(34, 20),
-                                  default_value=50)
-                    ],
-                    # ------ Save Progress Slider ------ #
-                    [
-                        sg.Text('Save Every K Seams',
-                                size=(25, 1),
-                                auto_size_text=True,
-                                justification='center',
-                                tooltip='Filter Selection'),
-                        sg.Slider(range=(1, 20),
-                                  orientation='h',
-                                  size=(34, 20),
-                                  default_value=10)
-                    ],
-                ],
-                         title='Options',
-                         title_color='red',
-                         relief=sg.RELIEF_SUNKEN,
-                         tooltip='Set Parameters to Feed into SC algo')
-            ],
-            [sg.Text('_' * 80)],
-            [sg.Button('Launch'),
-             sg.Cancel()],
-        ]
-
+        layout = get_browser_layout()
+        
         window = sg.Window('Seam Carving',
                            layout,
                            default_element_size=(40, 1),
@@ -393,59 +417,64 @@ if __name__ == '__main__':
             with open('file.txt', 'w') as file:
                 file.write(json.dumps(values))
             vals = json.load(open("file.txt"))
+            
+            print("json vals:", values)
+            
             '''
             vals structure (Exported Forms):
-            [1]: Main Folder. Change to image folder
-            [2]: Image Path. Change to show subpath per [1]
-            [3]: Row/Column parameter
-            [4]: Filter Type. To do. Defaults to Sobel?
-            [5]: Rescale Size. Resize to [0,1] range.
-            [6]: How often to checkpoint an image during carving. Defaults to 10. >10 is slow on gif creation
+            ['Browse']: Image Path.
+            [1]: Row/Column parameter
+            [2]: Filter Type. To do. Defaults to Sobel?
+            [3]: Rescale Size. Resize to [0,1] range.
+            [4]: How often to checkpoint an image during carving. Defaults to 10. >10 is slow on gif creation
             '''
             #Run Main Carving Method
             #--------------------------------------------------------#
 
-            output = 'carved/' + create_new_path(
-                vals['2'])  #specify carved output location
+            image_path = values['Browse']
+            dim = values[1]
+            operator = values[2]
+            scale = values[3]
+            save_period = values[4]
 
-            carve(vals['2'], dim=vals['3'], output=output,
-                  scale=vals['5'] / 100, save_progress= vals['6'], operator= vals['4']) #run seam carving
+            output = 'carved/' + create_new_path(image_path)  #specify carved output location
+            carve(image_path, dim=dim, output=output,
+                  scale = scale/ 100, save_progress= save_period, operator= operator) #run seam carving
 
-            save_energy_map(vals['2'])
-
-            window2_active = True
-
-            #Layout for window 2 specified. Show Original and Carved image side by side.
-            #--------------------------------------------------------#
-            layout2 = [
-                #[sg.PopupAnimated('gif\movie.gif')],
-                [
-                    sg.Text('Original Image'),
-                    sg.Image(r"{}".format(vals['2'])),
-                    sg.Image(r"{}".format(output)),
-                    sg.Text('Carved Image'),
-
-                ],
-                [sg.Image(r"{}".format('energy/energymap.png'))],
-                [sg.Button('Exit')],
-            ]
+            save_energy_map(image_path)
 
             #Popup Window Showing Carve Progression. Max Time on screen is fixed to 30 seconds before disappearing
             #--------------------------------------------------------#
             timeout = time.time() + 10  #30 second popup limit
             frames = len(os.listdir("temp/"))  #Count of frames in Gif
-            while True:
-                if time.time() < timeout:
-                    sg.PopupAnimated(image_source=r"gif\movie.gif",
-                                     time_between_frames=(30 / frames * 1000) / 6,
-                                     message="Showing Carve Progression. 10 Second Loop")
-                else:
-                    break
 
-            sg.PopupAnimated(None)
+            print("here")
+
+            # while True:
+            #     if time.time() < timeout:
+            #         sg.PopupAnimated(image_source=r"gif\movie.gif",
+            #                          time_between_frames=(30 / frames * 1000) / 6,
+            #                          message="Showing Carve Progression. 10 Second Loop")
+            #     else:
+            #         break
+
+            # print("here2c")
+
+            # sg.PopupAnimated(None)
+
+
+
+
+
+
+            window2_active = True
+            
+            #Layout for window 2 specified. Show Original and Carved image side by side.
+            #--------------------------------------------------------#
+            layout2 = get_carved_image_layout(image_path = image_path, output = output)
+
             #Launch Second Window
             #--------------------------------------------------------#
-
             window2 = sg.Window('Window 2', resizable=True).Layout(layout2)
 
             #EXIT Second Window
