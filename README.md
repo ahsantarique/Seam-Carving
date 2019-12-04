@@ -10,10 +10,10 @@ Create a new [conda](https://conda.io) environment with
 and activate it with
 
     conda activate seamcarving
-	
-From cmd line:
 
-    python carve.py
+From cmd line:
+    cd ../Seam-Carving/src
+    python main.py
 
 
   ![alt text](https://github.com/ahsantarique/Seam-Carving/blob/front_end/gif/movie.gif "Sample")
