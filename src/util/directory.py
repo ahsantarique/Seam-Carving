@@ -17,18 +17,18 @@ def create_new_path(path):
 
 
 def create_dirs():
-    # try:
-    #     os.makedirs('../temp')  #This is where progress images are stored
-    #     os.makedirs('../gif')  #This is where Gif will be stored
-    #     os.makedirs('../carved')
-    #     os.makedirs('../energy')
-    # except:
-    #Delete Folders if already in DIR
-    shutil.rmtree('../temp/')
-    shutil.rmtree('../gif/')
-    shutil.rmtree('../carved/')
-    shutil.rmtree('../energy/')
-    os.makedirs('../temp')
-    os.makedirs('../gif')
-    os.makedirs('../carved')
-    os.makedirs('../energy')
+    try:
+        os.makedirs('../temp')  #This is where progress images are stored
+        os.makedirs('../gif')  #This is where Gif will be stored
+        os.makedirs('../carved')
+        os.makedirs('../energy')
+    except:
+        #Delete Folders if already in DIR
+        shutil.rmtree('../temp/')
+        shutil.rmtree('../gif/')
+        shutil.rmtree('../carved/')
+        shutil.rmtree('../energy/')
+        os.makedirs('../temp')
+        os.makedirs('../gif')
+        os.makedirs('../carved')
+        os.makedirs('../energy')

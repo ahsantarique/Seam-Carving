@@ -3,3 +3,4 @@ energy/*
 gif/*
 temp/*
 .DS_Store
+*.pyc
