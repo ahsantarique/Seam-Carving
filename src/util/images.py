@@ -29,14 +29,20 @@ def transform_images():
 #Create Gif From all Temp Images Stored during Carving
 #--------------------------------------------------------#
 def create_gif():               #Create Gif from images partitioned through carving
-    files = os.listdir("../temp/")
-    files = ["../temp/" + file for file in files]
-    files.sort(key=lambda x: os.path.getmtime(x)) #Sort by Date Deposited. Otherwise Bad Ordering on GIF
-    images = []
-    for filename in files:
-        images.append(imageio.imread(filename))
-    imageio.mimsave('../gif/movie.gif', images, duration=.1) #writeout GIF
 
+    try:
+
+        files = os.listdir("../temp/")
+        files = ["../temp/" + file for file in files]
+        files.sort(key=lambda x: os.path.getmtime(x)) #Sort by Date Deposited. Otherwise Bad Ordering on GIF
+        images = []
+        for filename in files:
+            images.append(imageio.imread(filename))
+        imageio.mimsave('../gif/movie.gif', images, duration=.1) #writeout GIF
+
+    except:
+        print("error while creating gif!")
+        exit(0)
 
 
 def save_energy_map(img):

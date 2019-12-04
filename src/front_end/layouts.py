@@ -94,7 +94,7 @@ def get_browser_layout():
                     sg.Slider(range=(1, 100),
                                 orientation='h',
                                 size=(34, 20),
-                                default_value=98)
+                                default_value=90)
                 ],
                 # ------ Save Progress Slider ------ #
                 [
@@ -106,7 +106,7 @@ def get_browser_layout():
                     sg.Slider(range=(1, 20),
                                 orientation='h',
                                 size=(34, 20),
-                                default_value=20)
+                                default_value=10)
                 ],
             ],
                         title='Options',
