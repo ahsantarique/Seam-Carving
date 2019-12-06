@@ -5,7 +5,8 @@ from scipy.ndimage.filters import convolve
 #--------------------------------------------------------#
 #--------------------------------------------------------#
 #--------------------------------------------------------#
-def calc_energy(img, operator):
+
+def get_filter(operator):
 
     if operator == 'Sobel':
         dx = np.array([
@@ -18,7 +19,6 @@ def calc_energy(img, operator):
             [2.0, 0.0, -2.0],
             [1.0, 0.0, -1.0],
         ])
-
 
     if operator == 'Sobel_Feldman':
         dx = np.array([
@@ -46,24 +46,24 @@ def calc_energy(img, operator):
             [0.0, 0.0, 0.0],
             [-47.0, -162.0, -47.0],
         ])
-    # Stack Filter for all dims
 
+    return dx, dy
+
+
+def calc_energy(img, operator):
+
+    dx, dy = get_filter(operator)
 
     filter_dx = np.stack([dx] * 3, axis=2)
     filter_dy = np.stack([dy] * 3, axis=2)
 
 
-    #img to array
     img = img.astype('float32')
 
-    #Convolve filter over image channels
-    #http://cs.brown.edu/courses/cs129/results/proj3/taox/
-    #For each color channel, the energy is calculated by adding the
-    #absolute value of the gradient in the x direction to the absolute value of the gradient in the y direction.
-    
+  
     convolved = np.absolute(convolve(img, filter_dx)) + np.absolute(
         convolve(img, filter_dy))
 
     energy = convolved.sum(axis=2)
-    #Energy returns image gradient with filter convolved over each dim
+
     return energy
